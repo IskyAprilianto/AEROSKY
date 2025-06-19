@@ -102,10 +102,7 @@ async function deleteConversation(id, elementToRemove) {
       localStorage.removeItem("conversationId");
       currentConversationId = null;
       chatWindow.innerHTML = "";
-      displayMessage(
-        "bot",
-        "Percakapan telah dihapus. Silakan mulai yang baru."
-      );
+      displayMessage("bot", "Yah chat kita udah dihapus, ayo chat lagi!😃");
     }
     elementToRemove.remove();
     cleanupEmptyHeaders();
@@ -173,16 +170,13 @@ async function loadChatHistory(id) {
   if (!token) {
     displayMessage(
       "bot",
-      "Selamat datang! Anda bisa langsung chat sebagai tamu, atau login untuk menyimpan riwayat."
+      "Selamat datang! Aku AEROSKY, Ngobrol ga sih gabut banget nih rasanya😅."
     );
     return;
   }
   if (!id) {
     chatWindow.innerHTML = "";
-    displayMessage(
-      "bot",
-      "Pilih percakapan dari riwayat atau mulai yang baru."
-    );
+    displayMessage("bot", "Ngobrol yuk kak gabut nih😃");
     return;
   }
   try {
@@ -193,10 +187,7 @@ async function loadChatHistory(id) {
       localStorage.removeItem("conversationId");
       currentConversationId = null;
       chatWindow.innerHTML = "";
-      displayMessage(
-        "bot",
-        "Histori chat tidak ditemukan. Silakan mulai percakapan baru."
-      );
+      displayMessage("bot", "Gak ada history chat nih. Ayo ngobrol dulu✌️😉.");
       return;
     }
     const conversation = await response.json();
