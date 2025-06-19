@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar - AEROSKY Chatbot</title>
+    <link rel="stylesheet" href="auth.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-box">
+        <img src="assets/aerosky.svg" alt="AEROSKY Logo" class="auth-logo" />
+        <h2>Buat Akun Baru</h2>
+        <p>Daftar untuk menyimpan riwayat percakapan Anda.</p>
+        <form id="register-form">
+          <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+          <!-- Input Email Ditambahkan -->
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="input-group">
+            <label for="password">Password (minimal 8 karakter)</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          <button type="submit" class="auth-button">Daftar</button>
+        </form>
+        <div class="auth-switch">
+          <p>Sudah punya akun? <a href="login.html">Login di sini</a></p>
+        </div>
+        <p id="error-message" class="error-message"></p>
+      </div>
+    </div>
+    <!-- Script dihubungkan di sini -->
+    <script src="auth.js"></script>
+  </body>
+</html>
