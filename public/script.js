@@ -1,9 +1,9 @@
-// Menggunakan path relatif, bukan alamat lengkap
-const API_URL = "/api";
+const API_URL = "http://localhost:3000";
 
 const sidebar = document.getElementById("sidebar");
 const hamburgerButton = document.getElementById("hamburger-button");
 const closeSidebarButton = document.getElementById("close-sidebar-button");
+// Mengubah target ke kontainer baru
 const historyListContainer = document.getElementById("history-list-container");
 
 const chatWindow = document.getElementById("chat-window");
@@ -15,6 +15,7 @@ const headerActions = document.getElementById("header-actions");
 let currentConversationId = localStorage.getItem("conversationId");
 let guestConversationHistory = [];
 
+// --- FUNGSI BARU UNTUK PENGELOMPOKAN TANGGAL ---
 function getRelativeDateGroup(date) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -22,26 +23,35 @@ function getRelativeDateGroup(date) {
   yesterday.setDate(yesterday.getDate() - 1);
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const checkDate = new Date(date);
+
   if (checkDate >= today) return "Hari Ini";
   if (checkDate >= yesterday) return "Kemarin";
   if (checkDate >= sevenDaysAgo) return "7 Hari Terakhir";
   return "Lebih Lama";
 }
 
+// --- FUNGSI DIPERBARUI TOTAL: loadHistoryList ---
 async function loadHistoryList() {
   const token = localStorage.getItem("token");
   if (!token) return;
+
   try {
-    const res = await fetch(`${API_URL}/chats`, {
+    const res = await fetch(`${API_URL}/api/chats`, {
       headers: { "x-auth-token": token },
     });
     if (!res.ok) throw new Error("Gagal memuat riwayat");
+
     const histories = await res.json();
-    historyListContainer.innerHTML = "";
-    let lastHeader = null;
+    historyListContainer.innerHTML = ""; // Kosongkan kontainer
+
+    let lastHeader = null; // Penanda untuk grup terakhir
+
     histories.forEach((history) => {
       const groupTitle = getRelativeDateGroup(history.createdAt);
+
+      // Jika grupnya baru, buat judulnya
       if (groupTitle !== lastHeader) {
         const titleElement = document.createElement("h4");
         titleElement.className = "history-group-title";
@@ -49,16 +59,21 @@ async function loadHistoryList() {
         historyListContainer.appendChild(titleElement);
         lastHeader = groupTitle;
       }
-      const li = document.createElement("div");
-      li.className = "history-item";
+
+      // Buat elemen list untuk setiap percakapan
+      const li = document.createElement("div"); // Diubah dari ul>li ke div>div
+      li.className = "history-item"; // Kelas baru untuk penataan
       li.dataset.id = history._id;
+
       const titleSpan = document.createElement("span");
       titleSpan.className = "history-title";
       titleSpan.textContent = history.title || "Percakapan Lama";
+
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-history-btn";
       deleteBtn.title = "Hapus Percakapan";
       deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
       deleteBtn.onclick = async (e) => {
         e.stopPropagation();
         if (
@@ -69,11 +84,14 @@ async function loadHistoryList() {
           await deleteConversation(history._id, li);
         }
       };
+
       li.appendChild(titleSpan);
       li.appendChild(deleteBtn);
+
       if (history._id === currentConversationId) {
         li.classList.add("active");
       }
+
       li.onclick = () => {
         if (currentConversationId !== history._id) {
           currentConversationId = history._id;
@@ -83,6 +101,7 @@ async function loadHistoryList() {
         }
         toggleSidebar();
       };
+
       historyListContainer.appendChild(li);
     });
   } catch (error) {
@@ -90,32 +109,40 @@ async function loadHistoryList() {
   }
 }
 
+// Fungsi baru untuk menangani logika hapus
 async function deleteConversation(id, elementToRemove) {
   const token = localStorage.getItem("token");
   try {
-    const deleteRes = await fetch(`${API_URL}/chats/${id}`, {
+    const deleteRes = await fetch(`${API_URL}/api/chats/${id}`, {
       method: "DELETE",
       headers: { "x-auth-token": token },
     });
     if (!deleteRes.ok) throw new Error("Gagal menghapus");
+
     if (currentConversationId === id) {
       localStorage.removeItem("conversationId");
       currentConversationId = null;
       chatWindow.innerHTML = "";
-      displayMessage("bot", "Yah chat kita udah dihapus, ayo chat lagi!😃");
+      displayMessage(
+        "bot",
+        "Percakapan telah dihapus. Silakan mulai yang baru."
+      );
     }
     elementToRemove.remove();
+    // Cek jika grup menjadi kosong, hapus judulnya juga
     cleanupEmptyHeaders();
   } catch (err) {
     alert("Gagal menghapus percakapan.");
   }
 }
 
+// Fungsi baru untuk membersihkan judul grup yang kosong
 function cleanupEmptyHeaders() {
   const allHeaders = historyListContainer.querySelectorAll(
     ".history-group-title"
   );
   allHeaders.forEach((header) => {
+    // Jika elemen berikutnya bukan item riwayat, berarti grup ini kosong
     if (
       !header.nextElementSibling ||
       header.nextElementSibling.classList.contains("history-group-title")
@@ -132,6 +159,7 @@ function updateHistoryListActiveState() {
   });
 }
 
+// Sisa kode lainnya tetap sama
 function toggleSidebar() {
   sidebar.classList.toggle("open");
 }
@@ -140,6 +168,7 @@ function setupHeader() {
   const token = localStorage.getItem("token");
   headerActions.innerHTML = "";
   hamburgerButton.style.display = "none";
+
   if (token) {
     hamburgerButton.style.display = "block";
     const logoutButton = document.createElement("button");
@@ -159,7 +188,7 @@ function setupHeader() {
     loginButton.className = "header-button";
     loginButton.textContent = "Login";
     loginButton.onclick = () => {
-      window.location.href = "/login.html";
+      window.location.href = "login.html";
     };
     headerActions.appendChild(loginButton);
   }
@@ -170,24 +199,27 @@ async function loadChatHistory(id) {
   if (!token) {
     displayMessage(
       "bot",
-      "Selamat datang! Aku AEROSKY, Ngobrol ga sih gabut banget nih rasanya😅"
+      "Selamat datang! aku AEROSKY, login kak kalo mau data percakapan kesimpan biar ga mulai dari awal lagi😊"
     );
     return;
   }
   if (!id) {
     chatWindow.innerHTML = "";
-    displayMessage("bot", "Ngobrol yuk kak gabut nih😃");
+    displayMessage("bot", "Yuk ngobrol kak gabut nih😃");
     return;
   }
   try {
-    const response = await fetch(`${API_URL}/chats/${id}`, {
+    const response = await fetch(`${API_URL}/api/chats/${id}`, {
       headers: { "x-auth-token": token },
     });
     if (!response.ok) {
       localStorage.removeItem("conversationId");
       currentConversationId = null;
       chatWindow.innerHTML = "";
-      displayMessage("bot", "Gak ada history chat nih. Ayo ngobrol dulu✌️😉");
+      displayMessage(
+        "bot",
+        "Aduh kamu ga punya history percakapan. Silakan mulai percakapan baru."
+      );
       return;
     }
     const conversation = await response.json();
@@ -216,7 +248,7 @@ async function sendMessage() {
   try {
     let response;
     if (token) {
-      response = await fetch(`${API_URL}/chats`, {
+      response = await fetch(`${API_URL}/api/chats`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token },
         body: JSON.stringify({
@@ -229,7 +261,7 @@ async function sendMessage() {
         role: "user",
         parts: [{ text: message }],
       });
-      response = await fetch(`${API_URL}/chats/guest`, {
+      response = await fetch(`${API_URL}/api/chats/guest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -283,7 +315,7 @@ newChatButton.addEventListener("click", () => {
   currentConversationId = null;
   guestConversationHistory = [];
   chatWindow.innerHTML = "";
-  displayMessage("bot", "Percakapan baru dimulai.");
+  displayMessage("bot", "ngobrolin apa hari ini kak😊.");
   updateHistoryListActiveState();
 });
 

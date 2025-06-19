@@ -1,5 +1,4 @@
-// Menggunakan path relatif, bukan alamat lengkap
-const API_URL = "/api/auth";
+const API_URL = "http://localhost:3000/api/auth";
 
 const loginForm = document.getElementById("login-form");
 const registerForm = document.getElementById("register-form");
@@ -31,7 +30,7 @@ if (loginForm) {
       localStorage.setItem("token", data.token);
 
       // Arahkan ke halaman chat utama
-      window.location.href = "/"; // Mengarahkan ke root
+      window.location.href = "index.html";
     } catch (err) {
       errorMessage.textContent = err.message;
     }
@@ -67,7 +66,7 @@ if (registerForm) {
       }
 
       localStorage.setItem("token", data.token);
-      window.location.href = "/"; // Mengarahkan ke root
+      window.location.href = "index.html";
     } catch (err) {
       errorMessage.textContent = err.message;
     }
