@@ -170,7 +170,7 @@ async function loadChatHistory(id) {
   if (!token) {
     displayMessage(
       "bot",
-      "Selamat datang! Aku AEROSKY, Ngobrol ga sih gabut banget nih rasanya😅."
+      "Selamat datang! Aku AEROSKY, Ngobrol ga sih gabut banget nih rasanya😅"
     );
     return;
   }
@@ -187,7 +187,7 @@ async function loadChatHistory(id) {
       localStorage.removeItem("conversationId");
       currentConversationId = null;
       chatWindow.innerHTML = "";
-      displayMessage("bot", "Gak ada history chat nih. Ayo ngobrol dulu✌️😉.");
+      displayMessage("bot", "Gak ada history chat nih. Ayo ngobrol dulu✌️😉");
       return;
     }
     const conversation = await response.json();
