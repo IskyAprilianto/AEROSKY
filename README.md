@@ -116,4 +116,4 @@ Aplikasi Anda sekarang siap digunakan di lingkungan lokal!
 
 ---
 
-Dibuat dengan semangat oleh **[Nama Anda di sini]**.
+Dibuat dengan semangat oleh **[Isky D. Aprilianto]**.
